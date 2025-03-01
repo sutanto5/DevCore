@@ -228,6 +228,27 @@ class WelcomeViewProvider implements vscode.WebviewViewProvider {
   </div>
 
   <script>
+
+    function sendMessage() {      
+      let userInput = document.getElementById("userInput").value; // Get user input
+
+      fetch("http://127.0.0.1:5000/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input: userInput }) // Send user input to backend
+      })
+      .then(response => response.json())  // Convert response to JSON
+      .then(data => {
+          let aiResponse = data.response || "Error getting response."; // Store latest response
+
+          document.getElementById("response").innerText = aiResponse; 
+      })        
+      .catch(error => {
+          console.error("Error:", error);
+          document.getElementById("response").innerText = "Error fetching response."; // Show error in UI
+      });
+    } 
+
     const vscode = acquireVsCodeApi();
     document.getElementById('textForm').addEventListener('submit', (e) => {
       e.preventDefault();
@@ -239,6 +260,9 @@ class WelcomeViewProvider implements vscode.WebviewViewProvider {
       document.getElementById('textInput').value = ''; // Clear the input
     });
   </script>
+
+  <h3>Response:</h3>
+  <p id="response"></p>
 </body>
 </html>
 `;
