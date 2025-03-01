@@ -49,61 +49,184 @@ class WelcomeViewProvider implements vscode.WebviewViewProvider {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Welcome</title>
   <style>
-    /* Center content both vertically and horizontally */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+    /* Root Theme Variables */
+    :root {
+      --bg-color: var(--vscode-editor-background);
+      --text-color: var(--vscode-foreground);
+      --container-bg: var(--vscode-sideBar-background);
+      --border-color: var(--vscode-panel-border);
+      --button-bg: var(--vscode-button-background);
+      --button-hover: var(--vscode-button-hoverBackground);
+      --input-bg: var(--vscode-input-background);
+      --input-text: var(--vscode-input-foreground);
+      --input-border: var(--vscode-input-border);
+      --description-bg: var(--vscode-textBlockQuote-background);
+    }
+
+    /* Dark Mode Variables */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #121212;
+        --text-color: #e0e0e0;
+        --container-bg: #1e1e1e;
+        --border-color: #333;
+        --button-bg: #0a84ff;
+        --button-hover: #0070d1;
+        --input-bg: #252525;
+        --input-text: #e0e0e0;
+      }
+    }
+
+    /* Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--vscode-font-family);
+      transition: all 0.2s ease-in-out;
+    }
+
     body {
       display: flex;
-      justify-content: center;
-      align-items: center;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 10px;
       height: 100vh;
-      margin: 0;
-    }
-    .container {
-      padding: 20px;
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-    .input-group {
-      margin-top: 20px;
-    }
-    .input-group input {
-      padding: 10px;
-      font-size: 16px;
-      width: 250px;
-    }
-    .input-group button {
-      padding: 10px;
-      margin-left: 10px;
-      border: none;
       background: transparent;
+      color: var(--text-color);
+      font-size: var(--vscode-font-size);
+      line-height: 1.4;
+    }
+
+    .container {
+      background: transparent;
+      padding: 10px;
+      text-align: left;
+      width: 100%;
+    }
+
+    h2 {
+      color: var(--vscode-titleBar-activeForeground);
+      font-weight: 600;
+      margin-bottom: 15px;
+      font-size: 1.2em;
+    }
+
+    .description {
+      color: var(--text-color);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      padding: 12px;
+      background: var(--description-bg);
+      border-left: 3px solid var(--vscode-textLink-foreground);
+      border-radius: 3px;
+    }
+
+    .description h3 {
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--vscode-titleBar-activeForeground);
+    }
+
+    .description ul {
+      margin-left: 20px;
+      margin-top: 8px;
+    }
+
+    .description li {
+      margin-bottom: 6px;
+    }
+
+    .description strong {
+      color: var(--vscode-textLink-foreground);
+      font-weight: 500;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--input-border);
+      border-radius: 2px;
+      overflow: hidden;
+      background: var(--input-bg);
+      margin-top: 15px;
+    }
+
+    .input-group input {
+      flex: 1;
+      border: none;
+      padding: 8px 10px;
+      font-size: 13px;
+      outline: none;
+      background: var(--input-bg);
+      color: var(--input-text);
+      min-height: 32px;
+      font-family: var(--vscode-font-family);
+    }
+
+    .input-group input::placeholder {
+      color: var(--vscode-input-placeholderForeground);
+    }
+
+    .input-group button {
+      border: none;
+      background: var(--button-bg);
+      color: var(--vscode-button-foreground);
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
+      transition: background 0.2s ease;
+      min-width: 28px;
+      height: 32px;
     }
+
+    .input-group button:hover {
+      background: var(--button-hover);
+    }
+
     .input-group button svg {
-      width: 24px;
-      height: 24px;
-      vertical-align: middle;
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
     }
-     .input-group button:hover {
-      background-color: #f0f0f0;
-      border-radius: 4px;
-    }
+
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Welcome to TStack!</h2>
-    <p>This is your techstack tutor.</p>
-    <p>Input a project idea and I will help you get started!</p>
-    <form id="textForm">
-	<div class="input-group">
-      <input type="text" id="textInput" placeholder="Enter your project idea" />
-      <button type="submit">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <path d="M2 12h20M15 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+    <h2>Welcome to DevCore!</h2>
+    
+    <div class="description">
+      <h3>How to Use DevCore:</h3>
+      <ul>
+        <li><strong>Describe Your Project:</strong> Enter a brief description of what you want to build (e.g., "I want to create a social media app for photographers")</li>
+        <li><strong>Get Recommendations:</strong> DevCore will analyze your needs and suggest the best tech stack</li>
+        <li><strong>Receive Guidance:</strong> Get detailed explanations of why each technology was chosen and how to set them up</li>
+        <li><strong>Best Practices:</strong> Learn about development tools, extensions, and industry best practices for your stack</li>
+      </ul>
     </div>
-	</form>
+    
+    <form id="textForm">
+      <div class="input-group">
+        <input 
+          type="text" 
+          id="textInput" 
+          placeholder="Describe your project idea here..."
+        />
+        <button type="submit" title="Get Recommendations">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M15 6l6 6-6 6"/>
+          </svg>
+        </button>
+      </div>
+    </form>
   </div>
+
   <script>
     const vscode = acquireVsCodeApi();
     document.getElementById('textForm').addEventListener('submit', (e) => {
@@ -118,7 +241,6 @@ class WelcomeViewProvider implements vscode.WebviewViewProvider {
   </script>
 </body>
 </html>
-
 `;
 	}
 

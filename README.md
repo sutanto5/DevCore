@@ -1,1 +1,1 @@
-# UIUC_Hacks_LLMGPT
+# UIUC_Hacks_DevCore

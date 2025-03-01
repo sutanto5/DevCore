@@ -1,71 +1,62 @@
-# tstack README
+# DevCore - Your Tech Stack Tutor
 
-This is the README for your extension "tstack". After writing up a brief description, we recommend including the following sections.
+DevCore is a VS Code extension that helps developers choose and learn about the right technology stack for their project ideas. It provides personalized recommendations and guidance based on your project requirements.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- **Project Idea Input**: Simply type your project idea into the sidebar input field
+- **Interactive Interface**: Clean, modern UI with both light and dark theme support
+- **Personalized Recommendations**: Get tailored tech stack suggestions based on your project needs
+- **Real-time Guidance**: Instant feedback and recommendations as you describe your project
 
-For example if there is an image subfolder under your extension project workspace:
+## Getting Started
 
-\!\[feature X\]\(images/feature-x.png\)
+1. Install the DevCore extension from the VS Code marketplace
+2. Click on the DevCore icon in the activity bar (left sidebar)
+3. Enter your project idea in the input field
+4. Press enter or click the submit button to get recommendations
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## Usage
+
+1. Open the DevCore sidebar by clicking the DevCore icon in the activity bar
+2. Type your project idea (e.g., "I want to build a social media app for sharing recipes")
+3. Submit your idea
+4. Review the recommended tech stack and explanations
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- Visual Studio Code version 1.97.0 or higher
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+This extension doesn't require any additional settings. It works out of the box!
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+No known issues at this time. If you encounter any problems, please report them on our [GitHub repository](https://github.com/sutanto5/UIUC_Hacks_DevCore).
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.0.1
 
-### 1.0.0
+Initial release of DevCore:
+- Basic project idea input functionality
+- Tech stack recommendation system
+- Light/Dark theme support
+- Modern, clean UI
 
-Initial release of ...
+## Contributing
 
-### 1.0.1
+We welcome contributions! Please visit our [GitHub repository](https://github.com/sutanto5/UIUC_Hacks_DevCore) to:
+- Report issues
+- Submit pull requests
+- Suggest new features
+- Help with documentation
 
-Fixed issue #.
+## License
 
-### 1.1.0
-
-Added features X, Y, and Z.
+This extension is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+**Built with ❤️ by DevCore**
