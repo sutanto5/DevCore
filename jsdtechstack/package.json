@@ -1,22 +1,37 @@
 {
   "name": "jsdtechstack",
   "displayName": "JSDTechStack",
-  "description": "",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.97.0"
   },
-  "categories": [
-    "Other"
-  ],
   "activationEvents": [
   ],
   "main": "./extension.js",
   "contributes": {
-    "commands": [{
-      "command": "extension.openChatPopup",
-      "title": "Open Chat Popup"
-    }]
+    "viewsWelcome": [{
+      "view": "scm",
+      "contents": "In order to use git features, you can open a folder containing a git repository or clone from a URL.\n[Open Folder](command:vscode.openFolder)\n[Clone Repository](command:git.clone)\nTo learn more about how to use git and source control in VS Code [read our docs](https://aka.ms/vscode-scm).",
+        "when": "config.git.enabled && git.state == initialized && workbenchState == empty"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "chatgptSidebar",
+          "title": "ChatGPT",
+          "icon": "resources/Wrench Icon.png"
+        }
+      ]
+    },
+    "views": {
+      "chatgptSidebar": [
+        {
+          "id": "chatgptView",
+          "name": "ChatGPT"
+        }
+      ]
+    }
   },
   "scripts": {
     "lint": "eslint .",
@@ -25,10 +40,7 @@
   },
   "devDependencies": {
     "@types/vscode": "^1.97.0",
-    "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
-    "eslint": "^9.19.0",
-    "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "eslint": "^9.19.0"
   }
 }
