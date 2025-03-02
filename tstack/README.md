@@ -1,5 +1,5 @@
 
-![Mediamodifier Design Template (2)](https://github.com/user-attachments/assets/1f942623-5802-4d99-a2d3-0f9a9198e35e)
+![DevCore 1200x630](https://github.com/user-attachments/assets/15a3b52b-de25-4248-9c4b-32fe9577993a)
 
 # DevCore - Your Tech Stack Tutor
 
