@@ -1,3 +1,6 @@
+
+![Mediamodifier Design Template (2)](https://github.com/user-attachments/assets/1f942623-5802-4d99-a2d3-0f9a9198e35e)
+
 # DevCore - Your Tech Stack Tutor
 
 DevCore is a VS Code extension that helps developers choose and learn about the right technology stack for their project ideas. It provides personalized recommendations and guidance based on your project requirements.
