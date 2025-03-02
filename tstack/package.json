@@ -1,12 +1,12 @@
 {
   "name": "devcore",
   "displayName": "DevCore",
-  "description": "A tech stack tutor that helps you get started with your project ideas",
-  "version": "0.0.2",
+  "description": "A tech stack advisor that helps you choose the right technologies for your project",
+  "version": "0.0.3",
   "publisher": "DevCore",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sutanto5/UIUC_Hacks_DevCore"
+    "url": "https://github.com/yourusername/devcore"
   },
   "license": "MIT",
   "engines": {
@@ -15,32 +15,47 @@
   "categories": [
     "Other"
   ],
+  "icon": "resources/icon.png",
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "tstack.helloWorld",
-        "title": "Hello World"
+        "command": "devcore.helloWorld",
+        "title": "DevCore: Hello World"
+      },
+      {
+        "command": "devcore.setApiKey",
+        "title": "DevCore: Set OpenAI API Key"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "tstack-sidebar",
-          "title": "TStack",
+          "id": "devcore-sidebar",
+          "title": "DevCore",
           "icon": "$(info)"
         }
       ]
     },
     "views": {
-      "tstack-sidebar": [
+      "devcore-sidebar": [
         {
-          "id": "tstack-welcome",
+          "id": "devcore-welcome",
           "name": "Welcome",
           "type": "webview"
         }
       ]
+    },
+    "configuration": {
+      "title": "DevCore",
+      "properties": {
+        "devcore.openaiApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Your OpenAI API key"
+        }
+      }
     }
   },
   "scripts": {
@@ -69,5 +84,9 @@
     "typescript": "^5.7.3",
     "webpack": "^5.97.1",
     "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "openai": "^4.28.0"
   }
 }

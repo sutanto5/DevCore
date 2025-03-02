@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.npm
+
+# Build outputs
+out/
+dist/
+*.vsix
+
+# Environment files (containing sensitive data)
+.env
+*.env
+
+# VS Code specific files
+.vscode-test/
+.vscode/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Operating System
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+
+# Personal API keys and secrets
+**/*apikey*
+**/*secret*
+**/*password*
+
+# Temporary files
+*.tmp
+*.temp 

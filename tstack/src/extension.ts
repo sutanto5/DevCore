@@ -1,9 +1,47 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
+import 'dotenv/config';
 import * as vscode from 'vscode';
+import { OpenAI } from 'openai';
+
+let openai: OpenAI;
+
+async function initializeOpenAI() {
+	const apiKey = vscode.workspace.getConfiguration('devcore').get('openaiApiKey');
+	if (!apiKey) {
+		const response = await vscode.window.showInformationMessage(
+			'OpenAI API key is not set. Would you like to set it now?',
+			'Yes',
+			'No'
+		);
+		if (response === 'Yes') {
+			await setApiKey();
+		}
+		return false;
+	}
+	
+	openai = new OpenAI({
+		apiKey: apiKey as string
+	});
+	return true;
+}
+
+async function setApiKey() {
+	const apiKey = await vscode.window.showInputBox({
+		prompt: 'Enter your OpenAI API key',
+		password: true,
+		placeHolder: 'sk-...'
+	});
+
+	if (apiKey) {
+		await vscode.workspace.getConfiguration('devcore').update('openaiApiKey', apiKey, true);
+		vscode.window.showInformationMessage('API key has been saved');
+		openai = new OpenAI({ apiKey });
+		return true;
+	}
+	return false;
+}
 
 class WelcomeViewProvider implements vscode.WebviewViewProvider {
-	public static readonly viewType = 'tstack-welcome';
+	public static readonly viewType = 'devcore-welcome';
 	private _view?: vscode.WebviewView;
 	private _submittedText: string = '';  // Variable to store the text
 
@@ -39,38 +77,49 @@ class WelcomeViewProvider implements vscode.WebviewViewProvider {
 								text: 'Loading...'
 							});
 
-							// Simple fetch request
-							const response = await fetch('http://localhost:5001/chat', {
-								method: 'POST',
-								headers: {
-									'Content-Type': 'application/json',
-								},
-								body: JSON.stringify({ message: message.text })
+							// Call OpenAI API directly
+							const completion = await openai.chat.completions.create({
+								model: "gpt-3.5-turbo",
+								messages: [
+									{ role: "system", content: "You are a helpful tech stack advisor." },
+									{ role: "user", content: message.text }
+								]
 							});
-							
-							// Get response as text first
-							const responseText = await response.text();
-							
-							try {
-								// Try to parse as JSON
-								const data = JSON.parse(responseText);
-								webviewView.webview.postMessage({
-									command: 'response',
-									text: data.response || data.error || 'No response received'
-								});
-							} catch {
-								// If JSON parsing fails, show the raw text
-								webviewView.webview.postMessage({
-									command: 'response',
-									text: responseText
-								});
-							}
+
+							const response = completion.choices[0].message.content;
+
+							webviewView.webview.postMessage({
+								command: 'response',
+								text: response || 'No response received'
+							});
 
 						} catch (error) {
 							console.error('Error:', error);
+							let errorMessage = 'An unknown error occurred.';
+							
+							if (error instanceof Error) {
+								if (error.message.includes('429')) {
+									errorMessage = 'API quota exceeded. Please:\n' +
+										'1. Check your OpenAI account billing status at https://platform.openai.com/account/billing\n' +
+										'2. Make sure you have a valid payment method\n' +
+										'3. Consider upgrading your plan if needed';
+									
+									const response = await vscode.window.showInformationMessage(
+										'Would you like to update your API key?',
+										'Yes',
+										'No'
+									);
+									if (response === 'Yes') {
+										await setApiKey();
+									}
+								} else {
+									errorMessage = `Error: ${error.message}`;
+								}
+							}
+
 							webviewView.webview.postMessage({
 								command: 'response',
-								text: 'Error connecting to server. Please make sure:\n1. The Python server is running\n2. Your OpenAI API key is set correctly'
+								text: errorMessage
 							});
 						}
 						break;
@@ -85,234 +134,197 @@ class WelcomeViewProvider implements vscode.WebviewViewProvider {
 		return `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>DevCore</title>
+	<style>
+		:root {
+			--accent-color: #3794FF;
+			--bg-color: var(--vscode-editor-background);
+			--text-color: var(--vscode-foreground);
+		}
 
-    /* Root Theme Variables */
-    :root {
-      --bg-color: var(--vscode-editor-background);
-      --text-color: var(--vscode-foreground);
-      --container-bg: var(--vscode-sideBar-background);
-      --border-color: var(--vscode-panel-border);
-      --button-bg: var(--vscode-button-background);
-      --button-hover: var(--vscode-button-hoverBackground);
-      --input-bg: var(--vscode-input-background);
-      --input-text: var(--vscode-input-foreground);
-      --input-border: var(--vscode-input-border);
-      --description-bg: var(--vscode-textBlockQuote-background);
-    }
+		body {
+			padding: 20px;
+			color: var(--text-color);
+			font-family: var(--vscode-font-family);
+			background: var(--bg-color);
+		}
 
-    /* Dark Mode Variables */
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg-color: #121212;
-        --text-color: #e0e0e0;
-        --container-bg: #1e1e1e;
-        --border-color: #333;
-        --button-bg: #0a84ff;
-        --button-hover: #0070d1;
-        --input-bg: #252525;
-        --input-text: #e0e0e0;
-      }
-    }
+		h1 {
+			font-size: 24px;
+			margin-bottom: 24px;
+		}
 
-    /* Base Styles */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: var(--vscode-font-family);
-      transition: all 0.2s ease-in-out;
-    }
+		h2 {
+			font-size: 20px;
+			margin-bottom: 16px;
+		}
 
-    body {
-      display: flex;
-      justify-content: flex-start;
-      align-items: flex-start;
-      padding: 10px;
-      height: 100vh;
-      background: transparent;
-      color: var(--text-color);
-      font-size: var(--vscode-font-size);
-      line-height: 1.4;
-    }
+		.instruction-block {
+			border-left: 3px solid var(--accent-color);
+			padding-left: 16px;
+			margin-bottom: 24px;
+		}
 
-    .container {
-      background: transparent;
-      padding: 10px;
-      text-align: left;
-      width: 100%;
-    }
+		.step {
+			margin-bottom: 16px;
+		}
 
-    h2 {
-      color: var(--vscode-titleBar-activeForeground);
-      font-weight: 600;
-      margin-bottom: 15px;
-      font-size: 1.2em;
-    }
+		.step-title {
+			color: var(--accent-color);
+			font-weight: 600;
+			margin-bottom: 8px;
+		}
 
-    .description {
-      color: var(--text-color);
-      font-size: 13px;
-      line-height: 1.5;
-      margin-bottom: 20px;
-      padding: 12px;
-      background: var(--description-bg);
-      border-left: 3px solid var(--vscode-textLink-foreground);
-      border-radius: 3px;
-    }
+		.step-description {
+			color: var(--text-color);
+			opacity: 0.9;
+		}
 
-    .description h3 {
-      margin-bottom: 8px;
-      font-size: 14px;
-      color: var(--vscode-titleBar-activeForeground);
-    }
+		.input-container {
+			margin-top: 24px;
+			display: flex;
+			gap: 8px;
+		}
 
-    .description ul {
-      margin-left: 20px;
-      margin-top: 8px;
-    }
+		input {
+			flex: 1;
+			padding: 8px 12px;
+			background: var(--vscode-input-background);
+			color: var(--vscode-input-foreground);
+			border: 1px solid var(--vscode-input-border);
+			border-radius: 4px;
+		}
 
-    .description li {
-      margin-bottom: 6px;
-    }
+		button {
+			padding: 8px 16px;
+			background: var(--accent-color);
+			color: white;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+		}
 
-    .description strong {
-      color: var(--vscode-textLink-foreground);
-      font-weight: 500;
-    }
+		button:hover {
+			opacity: 0.9;
+		}
 
-    .input-group {
-      display: flex;
-      align-items: center;
-      border: 1px solid var(--input-border);
-      border-radius: 2px;
-      overflow: hidden;
-      background: var(--input-bg);
-      margin-top: 15px;
-    }
+		.chat-container {
+			margin-top: 20px;
+			max-height: 60vh;
+			overflow-y: auto;
+		}
 
-    .input-group input {
-      flex: 1;
-      border: none;
-      padding: 8px 10px;
-      font-size: 13px;
-      outline: none;
-      background: var(--input-bg);
-      color: var(--input-text);
-      min-height: 32px;
-      font-family: var(--vscode-font-family);
-    }
+		.message {
+			margin-bottom: 16px;
+			padding: 12px;
+			border-radius: 4px;
+			background: var(--vscode-input-background);
+		}
 
-    .input-group input::placeholder {
-      color: var(--vscode-input-placeholderForeground);
-    }
-
-    .input-group button {
-      border: none;
-      background: var(--button-bg);
-      color: var(--vscode-button-foreground);
-      padding: 4px 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background 0.2s ease;
-      min-width: 28px;
-      height: 32px;
-    }
-
-    .input-group button:hover {
-      background: var(--button-hover);
-    }
-
-    .input-group button svg {
-      width: 16px;
-      height: 16px;
-      stroke: currentColor;
-    }
-
-    /* Add styles for the response container */
-    .response-container {
-      margin-top: 20px;
-      padding: 12px;
-      background: var(--description-bg);
-      border-left: 3px solid var(--vscode-textLink-foreground);
-      border-radius: 3px;
-      color: var(--text-color);
-      font-size: 13px;
-      line-height: 1.5;
-      white-space: pre-wrap;
-      display: none; /* Hidden by default */
-    }
-
-  </style>
+		.response {
+			border-left: 3px solid var(--accent-color);
+		}
+	</style>
 </head>
 <body>
-  <div class="container">
-    <h2>Welcome to DevCore!</h2>
-    
-    <div class="description">
-      <h3>How to Use DevCore:</h3>
-      <ul>
-        <li><strong>Describe Your Project:</strong> Enter a brief description of what you want to build (e.g., "I want to create a social media app for photographers")</li>
-        <li><strong>Get Recommendations:</strong> DevCore will analyze your needs and suggest the best tech stack</li>
-        <li><strong>Receive Guidance:</strong> Get detailed explanations of why each technology was chosen and how to set them up</li>
-        <li><strong>Best Practices:</strong> Learn about development tools, extensions, and industry best practices for your stack</li>
-      </ul>
-    </div>
-    
-    <div class="input-group">
-      <input type="text" id="userInput" placeholder="Describe your project idea...">
-      <button id="submitButton">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-        </svg>
-      </button>
-    </div>
+	<h1>Welcome to DevCore!</h1>
+	
+	<div class="instruction-block">
+		<h2>How to Use DevCore:</h2>
 
-    <!-- Add response container -->
-    <div id="responseContainer" class="response-container"></div>
-  </div>
+		<div class="step">
+			<div class="step-title">Input Your OpenAI API key:</div>
+			<div class="step-description">Enter Cmd+ShiftP in the search bar and type in DevCore:OpenAI API Key, there input your api key</div>
+		</div>
+		
+		<div class="step">
+			<div class="step-title">Describe Your Project:</div>
+			<div class="step-description">Enter a brief description of what you want to build (e.g., "I want to create a social media app for photographers")</div>
+		</div>
+		
+		<div class="step">
+			<div class="step-title">Get Recommendations:</div>
+			<div class="step-description">DevCore will analyze your needs and suggest the best tech stack</div>
+		</div>
+		
+		<div class="step">
+			<div class="step-title">Receive Guidance:</div>
+			<div class="step-description">Get detailed explanations of why each technology was chosen and how to set them up</div>
+		</div>
+		
+		<div class="step">
+			<div class="step-title">Best Practices:</div>
+			<div class="step-description">Learn about development tools, extensions, and industry best practices for your stack</div>
+		</div>
+	</div>
 
-  <script>
-    const vscode = acquireVsCodeApi();
-    const submitButton = document.getElementById('submitButton');
-    const userInput = document.getElementById('userInput');
-    const responseContainer = document.getElementById('responseContainer');
+	<div class="input-container">
+		<input 
+			type="text" 
+			id="messageInput" 
+			placeholder="Describe your project idea here..."
+		/>
+		<button id="sendButton">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<line x1="22" y1="2" x2="11" y2="13"></line>
+				<polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+			</svg>
+		</button>
+	</div>
 
-    submitButton.addEventListener('click', sendMessage);
-    userInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        sendMessage();
-      }
-    });
+	<div class="chat-container" id="chatContainer"></div>
 
-    function sendMessage() {
-      const text = userInput.value.trim();
-      if (text) {
-        responseContainer.style.display = 'block';
-        responseContainer.textContent = 'Loading...';
-        vscode.postMessage({ command: 'submit', text });
-      }
-    }
-
-    window.addEventListener('message', event => {
-      const message = event.data;
-      switch (message.command) {
-        case 'response':
-          responseContainer.style.display = 'block';
-          responseContainer.textContent = message.text;
-          break;
-      }
-    });
-  </script>
+	<script>
+		const vscode = acquireVsCodeApi();
+		const chatContainer = document.getElementById('chatContainer');
+		const messageInput = document.getElementById('messageInput');
+		const sendButton = document.getElementById('sendButton');
+		
+		function addMessage(text, isResponse = false) {
+			const messageDiv = document.createElement('div');
+			messageDiv.className = \`message \${isResponse ? 'response' : ''}\`;
+			messageDiv.textContent = text;
+			chatContainer.appendChild(messageDiv);
+			chatContainer.scrollTop = chatContainer.scrollHeight;
+		}
+		
+		function handleSubmit() {
+			const text = messageInput.value.trim();
+			if (!text) return;
+			
+			addMessage(text);
+			messageInput.value = '';
+			
+			vscode.postMessage({
+				command: 'submit',
+				text: text
+			});
+		}
+		
+		messageInput.addEventListener('keypress', (e) => {
+			if (e.key === 'Enter' && !e.shiftKey) {
+				e.preventDefault();
+				handleSubmit();
+			}
+		});
+		
+		sendButton.addEventListener('click', handleSubmit);
+		
+		window.addEventListener('message', event => {
+			const message = event.data;
+			switch (message.command) {
+				case 'response':
+					if (message.text !== 'Loading...') {
+						addMessage(message.text, true);
+					}
+					break;
+			}
+		});
+	</script>
 </body>
-</html>
-`;
+</html>`;
 	}
 
 	// Method to get the stored text
@@ -332,28 +344,38 @@ interface ChatResponse {
 	error?: string;
 }
 
-// This method is called when your extension is activatedopen cursor
+// This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+	// Register the set API key command
+	context.subscriptions.push(
+		vscode.commands.registerCommand('devcore.setApiKey', setApiKey)
+	);
+
+	// Initialize OpenAI
+	initializeOpenAI();
+
 	const welcomeProvider = new WelcomeViewProvider(context.extensionUri);
 	
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(WelcomeViewProvider.viewType, welcomeProvider)
 	);
 
-	console.log('Congratulations, your extension "tstack" is now active!');
+	console.log('DevCore extension is now active!');
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('tstack.helloWorld', () => {
+	const disposable = vscode.commands.registerCommand('devcore.helloWorld', () => {
 		// The code you place here will be executed every time your command is executed
 		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from tstack!');
+		vscode.window.showInformationMessage('Hello from DevCore!');
 	});
 
 	context.subscriptions.push(disposable);
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+	// Clean up if needed
+}
