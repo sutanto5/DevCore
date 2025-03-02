@@ -1,1 +1,412 @@
-(()=>{"use strict";var n={265:function(n,e,t){var o,r=this&&this.__createBinding||(Object.create?function(n,e,t,o){void 0===o&&(o=t);var r=Object.getOwnPropertyDescriptor(e,t);r&&!("get"in r?!e.__esModule:r.writable||r.configurable)||(r={enumerable:!0,get:function(){return e[t]}}),Object.defineProperty(n,o,r)}:function(n,e,t,o){void 0===o&&(o=t),n[o]=e[t]}),i=this&&this.__setModuleDefault||(Object.create?function(n,e){Object.defineProperty(n,"default",{enumerable:!0,value:e})}:function(n,e){n.default=e}),s=this&&this.__importStar||(o=function(n){return o=Object.getOwnPropertyNames||function(n){var e=[];for(var t in n)Object.prototype.hasOwnProperty.call(n,t)&&(e[e.length]=t);return e},o(n)},function(n){if(n&&n.__esModule)return n;var e={};if(null!=n)for(var t=o(n),s=0;s<t.length;s++)"default"!==t[s]&&r(e,n,t[s]);return i(e,n),e});Object.defineProperty(e,"__esModule",{value:!0}),e.activate=function(n){const e=new d(n.extensionUri);n.subscriptions.push(a.window.registerWebviewViewProvider(d.viewType,e)),console.log('Congratulations, your extension "tstack" is now active!');const t=a.commands.registerCommand("tstack.helloWorld",(()=>{a.window.showInformationMessage("Hello World from tstack!")}));n.subscriptions.push(t)},e.deactivate=function(){};const a=s(t(398));class d{_extensionUri;static viewType="tstack-welcome";_view;_submittedText="";constructor(n){this._extensionUri=n}resolveWebviewView(n,e,t){this._view=n,n.webview.options={enableScripts:!0,localResourceRoots:[this._extensionUri]},n.webview.html=this._getHtmlContent(),n.webview.onDidReceiveMessage((n=>{"submitText"===n.command&&(this._submittedText=n.text,console.log("Submitted text:",this._submittedText),a.window.showInformationMessage(`Text submitted: ${this._submittedText}`))}))}_getHtmlContent(){return'<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Welcome</title>\n  <style>\n    @import url(\'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap\');\n\n    /* Root Theme Variables */\n    :root {\n      --bg-color: var(--vscode-editor-background);\n      --text-color: var(--vscode-foreground);\n      --container-bg: var(--vscode-sideBar-background);\n      --border-color: var(--vscode-panel-border);\n      --button-bg: var(--vscode-button-background);\n      --button-hover: var(--vscode-button-hoverBackground);\n      --input-bg: var(--vscode-input-background);\n      --input-text: var(--vscode-input-foreground);\n      --input-border: var(--vscode-input-border);\n      --description-bg: var(--vscode-textBlockQuote-background);\n    }\n\n    /* Dark Mode Variables */\n    @media (prefers-color-scheme: dark) {\n      :root {\n        --bg-color: #121212;\n        --text-color: #e0e0e0;\n        --container-bg: #1e1e1e;\n        --border-color: #333;\n        --button-bg: #0a84ff;\n        --button-hover: #0070d1;\n        --input-bg: #252525;\n        --input-text: #e0e0e0;\n      }\n    }\n\n    /* Base Styles */\n    * {\n      box-sizing: border-box;\n      margin: 0;\n      padding: 0;\n      font-family: var(--vscode-font-family);\n      transition: all 0.2s ease-in-out;\n    }\n\n    body {\n      display: flex;\n      justify-content: flex-start;\n      align-items: flex-start;\n      padding: 10px;\n      height: 100vh;\n      background: transparent;\n      color: var(--text-color);\n      font-size: var(--vscode-font-size);\n      line-height: 1.4;\n    }\n\n    .container {\n      background: transparent;\n      padding: 10px;\n      text-align: left;\n      width: 100%;\n    }\n\n    h2 {\n      color: var(--vscode-titleBar-activeForeground);\n      font-weight: 600;\n      margin-bottom: 15px;\n      font-size: 1.2em;\n    }\n\n    .description {\n      color: var(--text-color);\n      font-size: 13px;\n      line-height: 1.5;\n      margin-bottom: 20px;\n      padding: 12px;\n      background: var(--description-bg);\n      border-left: 3px solid var(--vscode-textLink-foreground);\n      border-radius: 3px;\n    }\n\n    .description h3 {\n      margin-bottom: 8px;\n      font-size: 14px;\n      color: var(--vscode-titleBar-activeForeground);\n    }\n\n    .description ul {\n      margin-left: 20px;\n      margin-top: 8px;\n    }\n\n    .description li {\n      margin-bottom: 6px;\n    }\n\n    .description strong {\n      color: var(--vscode-textLink-foreground);\n      font-weight: 500;\n    }\n\n    .input-group {\n      display: flex;\n      align-items: center;\n      border: 1px solid var(--input-border);\n      border-radius: 2px;\n      overflow: hidden;\n      background: var(--input-bg);\n      margin-top: 15px;\n    }\n\n    .input-group input {\n      flex: 1;\n      border: none;\n      padding: 8px 10px;\n      font-size: 13px;\n      outline: none;\n      background: var(--input-bg);\n      color: var(--input-text);\n      min-height: 32px;\n      font-family: var(--vscode-font-family);\n    }\n\n    .input-group input::placeholder {\n      color: var(--vscode-input-placeholderForeground);\n    }\n\n    .input-group button {\n      border: none;\n      background: var(--button-bg);\n      color: var(--vscode-button-foreground);\n      padding: 4px 8px;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      cursor: pointer;\n      transition: background 0.2s ease;\n      min-width: 28px;\n      height: 32px;\n    }\n\n    .input-group button:hover {\n      background: var(--button-hover);\n    }\n\n    .input-group button svg {\n      width: 16px;\n      height: 16px;\n      stroke: currentColor;\n    }\n\n  </style>\n</head>\n<body>\n  <div class="container">\n    <h2>Welcome to DevCore!</h2>\n    \n    <div class="description">\n      <h3>How to Use DevCore:</h3>\n      <ul>\n        <li><strong>Describe Your Project:</strong> Enter a brief description of what you want to build (e.g., "I want to create a social media app for photographers")</li>\n        <li><strong>Get Recommendations:</strong> DevCore will analyze your needs and suggest the best tech stack</li>\n        <li><strong>Receive Guidance:</strong> Get detailed explanations of why each technology was chosen and how to set them up</li>\n        <li><strong>Best Practices:</strong> Learn about development tools, extensions, and industry best practices for your stack</li>\n      </ul>\n    </div>\n    \n    <form id="textForm">\n      <div class="input-group">\n        <input \n          type="text" \n          id="textInput" \n          placeholder="Describe your project idea here..."\n        />\n        <button type="submit" title="Get Recommendations">\n          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n            <path d="M5 12h14M15 6l6 6-6 6"/>\n          </svg>\n        </button>\n      </div>\n    </form>\n  </div>\n\n  <script>\n    const vscode = acquireVsCodeApi();\n    document.getElementById(\'textForm\').addEventListener(\'submit\', (e) => {\n      e.preventDefault();\n      const text = document.getElementById(\'textInput\').value;\n      vscode.postMessage({\n        command: \'submitText\',\n        text: text\n      });\n      document.getElementById(\'textInput\').value = \'\'; // Clear the input\n    });\n  <\/script>\n</body>\n</html>\n'}getSubmittedText(){return this._submittedText}}},398:n=>{n.exports=require("vscode")}},e={},t=function t(o){var r=e[o];if(void 0!==r)return r.exports;var i=e[o]={exports:{}};return n[o].call(i.exports,i,i.exports,t),i.exports}(265);module.exports=t})();
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ([
+/* 0 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.activate = activate;
+exports.deactivate = deactivate;
+// The module 'vscode' contains the VS Code extensibility API
+// Import the module and reference it with the alias vscode in your code below
+const vscode = __importStar(__webpack_require__(1));
+class WelcomeViewProvider {
+    _extensionUri;
+    static viewType = 'tstack-welcome';
+    _view;
+    _submittedText = ''; // Variable to store the text
+    constructor(_extensionUri) {
+        this._extensionUri = _extensionUri;
+    }
+    resolveWebviewView(webviewView, context, _token) {
+        this._view = webviewView;
+        webviewView.webview.options = {
+            enableScripts: true,
+            localResourceRoots: [
+                this._extensionUri
+            ]
+        };
+        webviewView.webview.html = this._getHtmlContent(webviewView.webview);
+        // Handle messages from the webview
+        webviewView.webview.onDidReceiveMessage(async (message) => {
+            switch (message.command) {
+                case 'submit':
+                    try {
+                        // Show loading state
+                        webviewView.webview.postMessage({
+                            command: 'response',
+                            text: 'Loading...'
+                        });
+                        // Simple fetch request
+                        const response = await fetch('http://localhost:5001/chat', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ message: message.text })
+                        });
+                        // Get response as text first
+                        const responseText = await response.text();
+                        try {
+                            // Try to parse as JSON
+                            const data = JSON.parse(responseText);
+                            webviewView.webview.postMessage({
+                                command: 'response',
+                                text: data.response || data.error || 'No response received'
+                            });
+                        }
+                        catch {
+                            // If JSON parsing fails, show the raw text
+                            webviewView.webview.postMessage({
+                                command: 'response',
+                                text: responseText
+                            });
+                        }
+                    }
+                    catch (error) {
+                        console.error('Error:', error);
+                        webviewView.webview.postMessage({
+                            command: 'response',
+                            text: 'Error connecting to server. Please make sure:\n1. The Python server is running\n2. Your OpenAI API key is set correctly'
+                        });
+                    }
+                    break;
+            }
+        }, undefined, []);
+    }
+    _getHtmlContent(webview) {
+        return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+    /* Root Theme Variables */
+    :root {
+      --bg-color: var(--vscode-editor-background);
+      --text-color: var(--vscode-foreground);
+      --container-bg: var(--vscode-sideBar-background);
+      --border-color: var(--vscode-panel-border);
+      --button-bg: var(--vscode-button-background);
+      --button-hover: var(--vscode-button-hoverBackground);
+      --input-bg: var(--vscode-input-background);
+      --input-text: var(--vscode-input-foreground);
+      --input-border: var(--vscode-input-border);
+      --description-bg: var(--vscode-textBlockQuote-background);
+    }
+
+    /* Dark Mode Variables */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #121212;
+        --text-color: #e0e0e0;
+        --container-bg: #1e1e1e;
+        --border-color: #333;
+        --button-bg: #0a84ff;
+        --button-hover: #0070d1;
+        --input-bg: #252525;
+        --input-text: #e0e0e0;
+      }
+    }
+
+    /* Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--vscode-font-family);
+      transition: all 0.2s ease-in-out;
+    }
+
+    body {
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 10px;
+      height: 100vh;
+      background: transparent;
+      color: var(--text-color);
+      font-size: var(--vscode-font-size);
+      line-height: 1.4;
+    }
+
+    .container {
+      background: transparent;
+      padding: 10px;
+      text-align: left;
+      width: 100%;
+    }
+
+    h2 {
+      color: var(--vscode-titleBar-activeForeground);
+      font-weight: 600;
+      margin-bottom: 15px;
+      font-size: 1.2em;
+    }
+
+    .description {
+      color: var(--text-color);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      padding: 12px;
+      background: var(--description-bg);
+      border-left: 3px solid var(--vscode-textLink-foreground);
+      border-radius: 3px;
+    }
+
+    .description h3 {
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--vscode-titleBar-activeForeground);
+    }
+
+    .description ul {
+      margin-left: 20px;
+      margin-top: 8px;
+    }
+
+    .description li {
+      margin-bottom: 6px;
+    }
+
+    .description strong {
+      color: var(--vscode-textLink-foreground);
+      font-weight: 500;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--input-border);
+      border-radius: 2px;
+      overflow: hidden;
+      background: var(--input-bg);
+      margin-top: 15px;
+    }
+
+    .input-group input {
+      flex: 1;
+      border: none;
+      padding: 8px 10px;
+      font-size: 13px;
+      outline: none;
+      background: var(--input-bg);
+      color: var(--input-text);
+      min-height: 32px;
+      font-family: var(--vscode-font-family);
+    }
+
+    .input-group input::placeholder {
+      color: var(--vscode-input-placeholderForeground);
+    }
+
+    .input-group button {
+      border: none;
+      background: var(--button-bg);
+      color: var(--vscode-button-foreground);
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      min-width: 28px;
+      height: 32px;
+    }
+
+    .input-group button:hover {
+      background: var(--button-hover);
+    }
+
+    .input-group button svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+    }
+
+    /* Add styles for the response container */
+    .response-container {
+      margin-top: 20px;
+      padding: 12px;
+      background: var(--description-bg);
+      border-left: 3px solid var(--vscode-textLink-foreground);
+      border-radius: 3px;
+      color: var(--text-color);
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      display: none; /* Hidden by default */
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Welcome to DevCore!</h2>
+    
+    <div class="description">
+      <h3>How to Use DevCore:</h3>
+      <ul>
+        <li><strong>Describe Your Project:</strong> Enter a brief description of what you want to build (e.g., "I want to create a social media app for photographers")</li>
+        <li><strong>Get Recommendations:</strong> DevCore will analyze your needs and suggest the best tech stack</li>
+        <li><strong>Receive Guidance:</strong> Get detailed explanations of why each technology was chosen and how to set them up</li>
+        <li><strong>Best Practices:</strong> Learn about development tools, extensions, and industry best practices for your stack</li>
+      </ul>
+    </div>
+    
+    <div class="input-group">
+      <input type="text" id="userInput" placeholder="Describe your project idea...">
+      <button id="submitButton">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Add response container -->
+    <div id="responseContainer" class="response-container"></div>
+  </div>
+
+  <script>
+    const vscode = acquireVsCodeApi();
+    const submitButton = document.getElementById('submitButton');
+    const userInput = document.getElementById('userInput');
+    const responseContainer = document.getElementById('responseContainer');
+
+    submitButton.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    function sendMessage() {
+      const text = userInput.value.trim();
+      if (text) {
+        responseContainer.style.display = 'block';
+        responseContainer.textContent = 'Loading...';
+        vscode.postMessage({ command: 'submit', text });
+      }
+    }
+
+    window.addEventListener('message', event => {
+      const message = event.data;
+      switch (message.command) {
+        case 'response':
+          responseContainer.style.display = 'block';
+          responseContainer.textContent = message.text;
+          break;
+      }
+    });
+  </script>
+</body>
+</html>
+`;
+    }
+    // Method to get the stored text
+    getSubmittedText() {
+        return this._submittedText;
+    }
+}
+// This method is called when your extension is activatedopen cursor
+// Your extension is activated the very first time the command is executed
+function activate(context) {
+    const welcomeProvider = new WelcomeViewProvider(context.extensionUri);
+    context.subscriptions.push(vscode.window.registerWebviewViewProvider(WelcomeViewProvider.viewType, welcomeProvider));
+    console.log('Congratulations, your extension "tstack" is now active!');
+    // The command has been defined in the package.json file
+    // Now provide the implementation of the command with registerCommand
+    // The commandId parameter must match the command field in package.json
+    const disposable = vscode.commands.registerCommand('tstack.helloWorld', () => {
+        // The code you place here will be executed every time your command is executed
+        // Display a message box to the user
+        vscode.window.showInformationMessage('Hello World from tstack!');
+    });
+    context.subscriptions.push(disposable);
+}
+// This method is called when your extension is deactivated
+function deactivate() { }
+
+
+/***/ }),
+/* 1 */
+/***/ ((module) => {
+
+module.exports = require("vscode");
+
+/***/ })
+/******/ 	]);
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __webpack_require__(0);
+/******/ 	module.exports = __webpack_exports__;
+/******/ 	
+/******/ })()
+;
+//# sourceMappingURL=extension.js.map

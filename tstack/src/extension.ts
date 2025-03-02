@@ -25,23 +25,63 @@ class WelcomeViewProvider implements vscode.WebviewViewProvider {
 			]
 		};
 
-		webviewView.webview.html = this._getHtmlContent();
+		webviewView.webview.html = this._getHtmlContent(webviewView.webview);
 
 		// Handle messages from the webview
 		webviewView.webview.onDidReceiveMessage(
-			message => {
+			async message => {
 				switch (message.command) {
-					case 'submitText':
-						this._submittedText = message.text;
-						console.log('Submitted text:', this._submittedText);
-						vscode.window.showInformationMessage(`Text submitted: ${this._submittedText}`);
+					case 'submit':
+						try {
+							// Show loading state
+							webviewView.webview.postMessage({
+								command: 'response',
+								text: 'Loading...'
+							});
+
+							// Simple fetch request
+							const response = await fetch('http://localhost:5001/chat', {
+								method: 'POST',
+								headers: {
+									'Content-Type': 'application/json',
+								},
+								body: JSON.stringify({ message: message.text })
+							});
+							
+							// Get response as text first
+							const responseText = await response.text();
+							
+							try {
+								// Try to parse as JSON
+								const data = JSON.parse(responseText);
+								webviewView.webview.postMessage({
+									command: 'response',
+									text: data.response || data.error || 'No response received'
+								});
+							} catch {
+								// If JSON parsing fails, show the raw text
+								webviewView.webview.postMessage({
+									command: 'response',
+									text: responseText
+								});
+							}
+
+						} catch (error) {
+							console.error('Error:', error);
+							webviewView.webview.postMessage({
+								command: 'response',
+								text: 'Error connecting to server. Please make sure:\n1. The Python server is running\n2. Your OpenAI API key is set correctly'
+							});
+						}
 						break;
 				}
-			}
+			},
+			undefined,
+			[]
 		);
 	}
 
-	private _getHtmlContent() {
+	private _getHtmlContent(webview: vscode.Webview): string {
 		return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -195,6 +235,20 @@ class WelcomeViewProvider implements vscode.WebviewViewProvider {
       stroke: currentColor;
     }
 
+    /* Add styles for the response container */
+    .response-container {
+      margin-top: 20px;
+      padding: 12px;
+      background: var(--description-bg);
+      border-left: 3px solid var(--vscode-textLink-foreground);
+      border-radius: 3px;
+      color: var(--text-color);
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      display: none; /* Hidden by default */
+    }
+
   </style>
 </head>
 <body>
@@ -211,58 +265,51 @@ class WelcomeViewProvider implements vscode.WebviewViewProvider {
       </ul>
     </div>
     
-    <form id="textForm">
-      <div class="input-group">
-        <input 
-          type="text" 
-          id="textInput" 
-          placeholder="Describe your project idea here..."
-        />
-        <button type="submit" title="Get Recommendations">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 12h14M15 6l6 6-6 6"/>
-          </svg>
-        </button>
-      </div>
-    </form>
+    <div class="input-group">
+      <input type="text" id="userInput" placeholder="Describe your project idea...">
+      <button id="submitButton">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Add response container -->
+    <div id="responseContainer" class="response-container"></div>
   </div>
 
   <script>
-
-    function sendMessage() {      
-      let userInput = document.getElementById("userInput").value; // Get user input
-
-      fetch("http://127.0.0.1:5000/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: userInput }) // Send user input to backend
-      })
-      .then(response => response.json())  // Convert response to JSON
-      .then(data => {
-          let aiResponse = data.response || "Error getting response."; // Store latest response
-
-          document.getElementById("response").innerText = aiResponse; 
-      })        
-      .catch(error => {
-          console.error("Error:", error);
-          document.getElementById("response").innerText = "Error fetching response."; // Show error in UI
-      });
-    } 
-
     const vscode = acquireVsCodeApi();
-    document.getElementById('textForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const text = document.getElementById('textInput').value;
-      vscode.postMessage({
-        command: 'submitText',
-        text: text
-      });
-      document.getElementById('textInput').value = ''; // Clear the input
+    const submitButton = document.getElementById('submitButton');
+    const userInput = document.getElementById('userInput');
+    const responseContainer = document.getElementById('responseContainer');
+
+    submitButton.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    function sendMessage() {
+      const text = userInput.value.trim();
+      if (text) {
+        responseContainer.style.display = 'block';
+        responseContainer.textContent = 'Loading...';
+        vscode.postMessage({ command: 'submit', text });
+      }
+    }
+
+    window.addEventListener('message', event => {
+      const message = event.data;
+      switch (message.command) {
+        case 'response':
+          responseContainer.style.display = 'block';
+          responseContainer.textContent = message.text;
+          break;
+      }
     });
   </script>
-
-  <h3>Response:</h3>
-  <p id="response"></p>
 </body>
 </html>
 `;
@@ -272,6 +319,17 @@ class WelcomeViewProvider implements vscode.WebviewViewProvider {
 	public getSubmittedText(): string {
 		return this._submittedText;
 	}
+}
+
+// Add interface for error response
+interface ErrorResponse {
+	error?: string;
+}
+
+// Add interface for the response data
+interface ChatResponse {
+	response?: string;
+	error?: string;
 }
 
 // This method is called when your extension is activatedopen cursor
