@@ -5,6 +5,8 @@
 
 DevCore is a VS Code extension that helps developers choose and learn about the right technology stack for their project ideas. It provides personalized recommendations and guidance based on your project requirements.
 
+Our Website: devcore-ext.webflow.io
+
 ## Features
 
 - **Project Idea Input**: Simply type your project idea into the sidebar input field
