@@ -19,6 +19,9 @@ DevCore is a VS Code extension that helps developers choose and learn about the 
 3. Enter your project idea in the input field
 4. Press enter or click the submit button to get recommendations
 
+<img width="316" alt="Screenshot 2025-03-02 at 10 47 55 AM" src="https://github.com/user-attachments/assets/a1e4149b-87e9-4755-b95b-66aa75d075dc" />
+
+
 ## Usage
 
 1. Open the DevCore sidebar by clicking the DevCore icon in the activity bar
